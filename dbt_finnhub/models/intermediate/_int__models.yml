@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: int_daily_returns
+    columns:
+      - name: symbol
+        tests: [not_null]
+      - name: date_key
+        tests: [not_null]
+      - name: daily_return
+        tests: [not_null]
+
+  - name: int_volume_stats
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [symbol, date_key]
+    columns:
+      - name: symbol
+        tests: [not_null]
+      - name: date_key
+        tests: [not_null]

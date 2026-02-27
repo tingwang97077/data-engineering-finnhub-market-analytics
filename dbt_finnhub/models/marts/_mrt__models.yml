@@ -1,0 +1,101 @@
+version: 2
+
+models:
+  - name: dim_companies
+    columns:
+      - name: symbol
+        tests: [not_null, unique]
+      - name: sector
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - Technology
+                  - Healthcare
+                  - Financials
+                  - Consumer Discretionary
+                  - Consumer Staples
+                  - Industrials
+                  - Energy
+                  - Communication Services
+                  - Utilities
+                  - Real Estate
+                  - Materials
+
+  - name: dim_dates
+    columns:
+      - name: date_key
+        tests: [not_null, unique]
+
+  - name: fct_daily_prices
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [symbol, date_key]
+    columns:
+      - name: symbol
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_companies')
+                field: symbol
+      - name: date_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_dates')
+                field: date_key
+      - name: close
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              arguments:
+                min_value: 0
+                max_value: 100000
+      - name: volume
+        tests: [not_null]
+
+  - name: fct_company_news
+    config:
+      enabled: "{{ var('enable_news_models', false) }}"
+    columns:
+      - name: news_id
+        tests: [not_null, unique]
+      - name: symbol
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_companies')
+                field: symbol
+      - name: date_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_dates')
+                field: date_key
+
+  - name: fct_company_financials
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [symbol, date_key]
+    columns:
+      - name: symbol
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_companies')
+                field: symbol
+      - name: date_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_dates')
+                field: date_key

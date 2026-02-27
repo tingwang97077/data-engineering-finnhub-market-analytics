@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: finnhub_raw
+    database: "{{ target.project }}"
+    schema: "{{ var('raw_dataset') }}"
+    tables:
+      - name: raw_candles
+        config:
+          loaded_at_field: _loaded_at
+          freshness:
+            warn_after: {count: 36, period: hour}
+            error_after: {count: 96, period: hour}
+      - name: raw_company_profiles
+      - name: raw_company_news
+      - name: raw_company_financials

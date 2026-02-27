@@ -1,0 +1,17 @@
+.git
+.gitlab
+.env
+.env.*
+!.env.docker.example
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.venv
+**/venv
+**/target
+**/logs
+**/.terraform
+**/*.tfstate
+**/*.tfstate.*
+*.log
+.DS_Store

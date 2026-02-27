@@ -1,0 +1,58 @@
+name: dbt_finnhub
+version: 1.0.0
+config-version: 2
+
+profile: dbt_finnhub
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+flags:
+  bigquery_use_batch_source_freshness: true
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+models:
+  dbt_finnhub:
+    staging:
+      +materialized: view
+      +schema: stg
+    intermediate:
+      +materialized: view
+      +schema: int
+    marts:
+      +materialized: table
+      +schema: mart
+    metrics:
+      +materialized: table
+      +schema: metrics
+
+seeds:
+  dbt_finnhub:
+    +schema: seed
+
+snapshots:
+  dbt_finnhub:
+    +schema: snap
+
+vars:
+  raw_dataset: finnhub_raw
+  enable_news_models: true
+  accepted_gics_sectors:
+    - Technology
+    - Healthcare
+    - Financials
+    - Consumer Discretionary
+    - Consumer Staples
+    - Industrials
+    - Energy
+    - Communication Services
+    - Utilities
+    - Real Estate
+    - Materials

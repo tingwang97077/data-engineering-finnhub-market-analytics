@@ -1,0 +1,6 @@
+finnhub-python
+yfinance
+pandas==2.1.4
+pyarrow
+google-cloud-storage
+psycopg2-binary

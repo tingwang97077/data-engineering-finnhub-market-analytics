@@ -1,0 +1,12 @@
+dbt_finnhub:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT_ID', 'seismic-ground-488312-u6') }}"
+      dataset: "{{ env_var('DBT_DATASET', 'finnhub_dw') }}"
+      location: "{{ env_var('BQ_LOCATION', 'europe-west9') }}"
+      threads: 4
+      job_execution_timeout_seconds: 300
+      job_retries: 1

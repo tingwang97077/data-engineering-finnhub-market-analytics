@@ -1,0 +1,59 @@
+version: 2
+
+models:
+  - name: stg_candles
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [symbol, date_key]
+    columns:
+      - name: symbol
+        tests: [not_null]
+      - name: date_key
+        tests: [not_null]
+      - name: close
+        tests: [not_null]
+      - name: volume
+        tests: [not_null]
+
+  - name: stg_company_profiles
+    columns:
+      - name: symbol
+        tests: [not_null, unique]
+      - name: sector
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - Technology
+                  - Healthcare
+                  - Financials
+                  - Consumer Discretionary
+                  - Consumer Staples
+                  - Industrials
+                  - Energy
+                  - Communication Services
+                  - Utilities
+                  - Real Estate
+                  - Materials
+
+  - name: stg_company_news
+    config:
+      enabled: "{{ var('enable_news_models', false) }}"
+    columns:
+      - name: symbol
+        tests: [not_null]
+      - name: news_ts
+        tests: [not_null]
+
+  - name: stg_company_financials
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [symbol, date_key]
+    columns:
+      - name: symbol
+        tests: [not_null]
+      - name: date_key
+        tests: [not_null]

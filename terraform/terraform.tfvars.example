@@ -1,0 +1,12 @@
+project_id         = "de-zoomcamp-final-project"
+region             = "europe-west9"
+location           = "europe-west9"
+environment        = "dev"
+bucket_name        = "de-zoomcamp-final-project-finnhub"
+dataset_id         = "finnhub_dw"
+service_account_id = "de-final-project"
+
+labels = {
+  owner = "ting"
+  stack = "zoomcamp-final-project"
+}
