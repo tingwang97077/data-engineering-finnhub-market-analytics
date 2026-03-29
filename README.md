@@ -7,7 +7,6 @@ It ingests market data to GCS, transforms it in BigQuery with dbt, and serves vi
 
 1. Which sectors outperform over the last 12 months?
 2. Which sectors are the most volatile?
-3. How do trading volumes evolve and where are anomalies?
 
 ## Architecture
 
@@ -68,7 +67,7 @@ Makefile
 
 ## Personal Setup (Bring Your Own Credentials)
 
-Each contributor must use their own cloud project, API key, and local config.
+**Each contributor must use their own cloud project, API key, and local config.**
 
 ### 1) Copy templates
 
@@ -196,12 +195,6 @@ Run `make help` for both local and Docker targets.
 - `your_gcp_project_id.finnhub_dw_mart.fct_daily_prices`
 - `your_gcp_project_id.finnhub_dw_metrics.monthly_top_worst_sector`
 
-## Costs (Current Scale)
-
-- GCS: negligible (MB-scale per year)
-- BigQuery: low scan volume at this scale
-- Main driver: ad-hoc query usage
-
 ## Limits / Design Decisions
 
 - Universe is a curated sample of 50 stocks (not top-50 dynamic ranking).
@@ -230,6 +223,7 @@ GitHub repository settings required for CI/CD:
 ## Current Outputs
 
 - Sector cumulative return time series
+  ![screenshot](docs/images/sector_cumulative_return.png)
 - Sector annualized volatility ranking
-- Top/Worst sector for latest month
-- Volume anomalies table (`volume_zscore > 2`)
+  ![screenshot](docs/images/sector_volatility.png)
+
