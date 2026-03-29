@@ -1,6 +1,8 @@
 # Financial market analytics for 50 U.S. large-cap stocks
 
-This is the final project for the Data Engineering Zoomcamp 2026 cohort. It is an open-source market analytics platform focused on a curated universe of 50 U.S. large-cap stocks across 11 GICS sectors. The platform ingests market data into GCS, transforms it in BigQuery using dbt, and delivers visual analytics through Looker Studio.
+This is the final project for the Data Engineering Zoomcamp 2026 cohort. It is an open-source market analytics platform built on a curated universe of 50 U.S. large-cap stocks across 11 GICS sectors. The pipeline ingests market data into GCS, transforms it in BigQuery using dbt, and serves dashboards in Looker Studio.
+
+The project is designed to answer practical market questions, such as which sectors have outperformed over the past 12 months and which sectors have been the most volatile. Data ingestion runs in batch mode and supports daily, weekly, and monthly execution. The pipeline also supports backfilling, making it possible to load historical data for any selected time period.
 
 
 ## Business Questions
