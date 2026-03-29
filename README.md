@@ -135,6 +135,13 @@ In practice, this makes the warehouse efficient for common use cases such as:
 
 Partitioning and clustering are applied only to mart-level fact tables. Staging, intermediate, and dimension models are kept simpler because they are either smaller, reused as transformation layers, or not queried at the same scale as analytical fact tables.
 
+## Current Outputs
+
+link to dashboard : https://lookerstudio.google.com/s/iEJ3mGGKP2g
+- Sector cumulative return time series
+  ![screenshot](docs/images/sector_cumulative_return.png)
+- Sector annualized volatility ranking
+  ![screenshot](docs/images/sector_volatility.png)
 
 
 ## Quick Start (Bring Your Own Credentials)
@@ -299,12 +306,3 @@ Run `make help` for both local and Docker targets.
 GitHub repository settings required for CI/CD:
 - Variables: `GCP_PROJECT_ID`, `GCS_BUCKET` (optional: `GCP_REGION`, `BQ_LOCATION`, `ENVIRONMENT`)
 - Secrets: `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT`
-
-## Current Outputs
-
-link to dashboard : https://lookerstudio.google.com/s/iEJ3mGGKP2g
-- Sector cumulative return time series
-  ![screenshot](docs/images/sector_cumulative_return.png)
-- Sector annualized volatility ranking
-  ![screenshot](docs/images/sector_volatility.png)
-
