@@ -67,7 +67,7 @@ Makefile
 - Local ADC auth: `your_gcloud_auth`
 - Finnhub API key
 
-## Personal Setup (Bring Your Own Credentials)
+## Quick Start (Bring Your Own Credentials)
 
 **Each contributor must use their own cloud project, API key, and local config.**
 
