@@ -63,7 +63,7 @@ Makefile
 
 **Each contributor must use their own cloud project, API key, and local config.**
 
-## Prerequisites
+## 1. Prerequisites
 
 - Docker + Docker Compose plugin
 - Google Cloud project: `your_gcp_project`
@@ -120,7 +120,7 @@ If placeholders such as `replace_me` are still present, do not run ingestion yet
 - Keep secrets in local files or GitHub Secrets only.
 - Commit only `*.example` templates.
 
-## Docker Quickstart (Recommended)
+## 2. Docker Quickstart (Recommended)
 
 ### 1) Configure environment
 
