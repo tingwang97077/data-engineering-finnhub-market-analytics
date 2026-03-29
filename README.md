@@ -1,5 +1,15 @@
 # Financial market analytics for 50 U.S. large-cap stocks
 
+![Cloud](https://img.shields.io/badge/Cloud-Google%20Cloud-%234285F4?logo=googlecloud&logoColor=white)
+![IaC](https://img.shields.io/badge/IaC-Terraform-%23844FBA?logo=terraform&logoColor=white)
+![Orchestration](https://img.shields.io/badge/Orchestration-Airflow-%23017CEE?logo=apacheairflow&logoColor=white)
+![Runtime](https://img.shields.io/badge/Runtime-Docker%20Compose-%232496ED?logo=docker&logoColor=white)
+![Data Ingestion](https://img.shields.io/badge/Data%20Ingestion-Python-%233776AB?logo=python&logoColor=white)
+![Warehouse](https://img.shields.io/badge/Warehouse-BigQuery-%23669DF6?logo=googlebigquery&logoColor=white)
+![Transform](https://img.shields.io/badge/Transform-dbt-%23FF694B?logo=dbt&logoColor=white)
+![Dashboard](https://img.shields.io/badge/Dashboard-Looker%20Studio-%234285F4)
+
+
 This is the final project for the Data Engineering Zoomcamp 2026 cohort. It is an open-source market analytics platform built on a curated universe of 50 U.S. large-cap stocks across 11 GICS sectors. The pipeline ingests market data into GCS, transforms it in BigQuery using dbt, and serves dashboards in Looker Studio.
 
 The project is designed to answer practical market questions, such as which sectors have outperformed over the past 12 months and which sectors have been the most volatile. Data ingestion runs in batch mode and supports daily, weekly, and monthly execution. The pipeline also supports backfilling, making it possible to load historical data for any selected time period.
@@ -10,34 +20,30 @@ The project is designed to answer practical market questions, such as which sect
 1. Which sectors outperform over the last 12 months?
 2. Which sectors are the most volatile?
 
+## Repository Structure
+
+```text
+├── airflow/                           # Airflow orchestration and DAG definitions
+├── dbt_finnhub/                       # dbt project for data transformation in BigQuery
+├── docker-compose.yml                 # Local multi-service development environment
+├── docs/                              # Project documentation and architecture assets
+├── ingestion/                         # Data ingestion scripts and pipeline logic
+├── Makefile                           # Command shortcuts for common project tasks
+├── README.md                          # Main project documentation
+└── terraform/                         # Infrastructure as Code for Google Cloud resources
+
+```
+
 ## Architecture
 
 ![img](/docs/images/architecture.png)
 
-### Architecture Notes
+This project is built as a batch-oriented market analytics platform on Google Cloud. Infrastructure is provisioned with Terraform, which creates the GCS bucket, BigQuery datasets, and required IAM resources.
 
-- Data sources: `Finnhub API` with `yfinance` fallback for candles.
-- Containerized runtime: Docker Compose for Airflow, ingestion, dbt, Terraform, and GCP CLI tooling.
-- Cloud layer: GCS data lake + BigQuery raw/external + BigQuery marts/metrics.
-- Transformation : dbt models and tests
-- BI : Looker Studio dashboard
+Data is collected from the `Finnhub API`, with `yfinance` used as a fallback source for candle data when needed. The ingestion layer is implemented in Python and orchestrated by Airflow. Raw files are stored in GCS as Hive-partitioned Parquet files before being exposed in BigQuery through the raw layer.
 
-```text
-[Terraform] -> [GCP: GCS bucket + BigQuery datasets + IAM]
+Transformations are managed with dbt in BigQuery. The project follows a layered approach with staging, intermediate, mart, and metrics models. These models clean and standardize the raw data, compute derived indicators such as returns and volume statistics, and build analytics-ready fact tables, dimensions, and sector-level aggregates.
 
-[Docker Compose] -> [Airflow] -> triggers -> [Python ingestion (uv)]
-[Docker Compose] -> [dbt]
-[Docker Compose] -> [terraform]
-[Docker Compose] -> [gcloud/bq]
-
-[Finnhub API] --------------------> [Python ingestion (uv)] -> [GCS raw Parquet (Hive)]
-[yfinance fallback for candles] --> [Python ingestion (uv)] -> [GCS raw Parquet (Hive)]
-
-[GCS raw Parquet] -> [BigQuery external tables: finnhub_raw]
-[BigQuery finnhub_raw] -> [dbt: stg -> int -> marts -> metrics]
-[dbt] -> [BigQuery curated datasets: finnhub_dw_mart + finnhub_dw_metrics]
-[BigQuery curated datasets] -> [Looker Studio dashboard]
-```
 
 ## Dimensional Model Design
 
@@ -48,16 +54,88 @@ The project is designed to answer practical market questions, such as which sect
 The central fact table is `fct_daily_prices`, linked to shared dimensions `dim_dates` and `dim_companies`.
 Additional facts `fct_company_news` and `fct_company_financials` reuse the same dimensions for consistent filtering by date, symbol, and sector.
 
-## Repository Structure
+### dbt model DAG
 
 ```text
-airflow/          # Airflow DAGs + Dockerfile
-ingestion/        # Finnhub ingestion package + CLI + Dockerfile
-dbt_finnhub/      # dbt project + Dockerfile
-terraform/        # IaC (GCS, BigQuery, SA, IAM)
-docker-compose.yml
-Makefile
+├── intermediate/                      # Intermediate transformation models
+│   ├── _int__models.yml               # Intermediate model schema and tests
+│   ├── int_daily_returns.sql          # Computes daily return metrics
+│   └── int_volume_stats.sql           # Computes rolling volume statistics
+├── marts/                             # Final analytics-ready dimensional models
+│   ├── _mrt__models.yml               # Mart model schema and tests
+│   ├── dim_companies.sql              # Company dimension
+│   ├── dim_dates.sql                  # Date dimension
+│   ├── fct_company_financials.sql     # Daily company market metrics
+│   ├── fct_company_news.sql           # Company news events
+│   └── fct_daily_prices.sql           # Daily stock price facts
+├── metrics/                           # Reporting-focused aggregate models
+│   ├── _metrics__models.yml           # Metric model schema and tests
+│   ├── sector_performance.sql         # Sector performance analysis
+│   └── sector_volatility.sql          # Sector volatility analysis
+└── staging/                           # Source-aligned staging layer
+    ├── _stg__models.yml               # Staging model schema and tests
+    ├── _stg__sources.yml              # Source definitions
+    ├── stg_candles.sql                # Raw market price staging
+    ├── stg_company_financials.sql     # Raw financial data staging
+    ├── stg_company_news.sql           # Raw news data staging
+    └── stg_company_profiles.sql       # Raw company profile staging
 ```
+
+### Data architecture
+
+The project follows a `medallion-style` architecture across Google Cloud Storage (GCS) and BigQuery.
+
+Raw source data is first ingested into GCS, then loaded into BigQuery, where dbt builds the Silver and Gold layers.
+
+| Layer | Storage | BigQuery Dataset(s) | Purpose | Example Assets |
+|-------|---------|----------------------|---------|----------------|
+| Bronze | GCS + BigQuery | `finnhub_raw` | Stores raw data ingested from the source with minimal transformation. Raw files are first landed in GCS, then loaded into BigQuery raw tables. | GCS raw files, `raw_candles`, `raw_company_financials`, `raw_company_news`, `raw_company_profiles` |
+| Silver | BigQuery | `finnhub_dw_stg`, `finnhub_dw_int`, `finnhub_dw_snap` | Cleans, standardizes, validates, and enriches source data through staging, intermediate models, and snapshots. | `stg_candles`, `stg_company_financials`, `stg_company_news`, `stg_company_profiles`, `int_daily_returns`, `int_volume_stats`, `snap_company_profiles` |
+| Gold | BigQuery | `finnhub_dw_mart`, `finnhub_dw_metrics` | Provides analytics-ready dimensional models and aggregated datasets for BI and reporting. | `dim_companies`, `dim_dates`, `fct_daily_prices`, `fct_company_financials`, `fct_company_news`, `sector_performance`, `sector_volatility`, `monthly_top_worst_sector` |
+| Reference | BigQuery | `finnhub_dw_seed` | Stores static reference data used to enrich transformation and reporting models. | `sector_mapping` |
+
+### Partitioning and Clustering Strategy
+
+To optimize query performance and control scan costs in BigQuery, the mart layer uses a time-based partitioning strategy combined with business-oriented clustering on the largest fact tables.
+
+**Partitioning**
+
+All high-volume fact tables are partitioned on `date_key` to limit the amount of data scanned during time-based analysis:
+
+- `fct_daily_prices`: partitioned by day
+- `fct_company_news`: partitioned by day
+- `fct_company_financials`: partitioned by month
+
+Daily partitioning is used for market prices and news because these datasets are queried at fine time granularity. Monthly partitioning is used for financial snapshots because the data changes less frequently and does not require daily partitions.
+
+**Clustering**
+
+Within each partition, tables are clustered by the most common analytical dimensions:
+
+- `fct_daily_prices`: clustered by `symbol`, `sector`
+- `fct_company_news`: clustered by `symbol`, `source`
+- `fct_company_financials`: clustered by `symbol`
+
+This improves performance for queries filtering or aggregating by ticker, sector, or news source, which are the main access patterns in the project.
+
+**Design Rationale**
+
+This strategy is designed to support two goals:
+
+1. Reduce storage scan volume by pruning partitions with date filters.
+2. Improve read efficiency inside each partition by colocating rows that are frequently queried together.
+
+In practice, this makes the warehouse efficient for common use cases such as:
+- analyzing price history over a date range,
+- computing sector-level performance metrics,
+- retrieving company news for a given symbol and period,
+- comparing financial indicators across companies.
+
+**Scope**
+
+Partitioning and clustering are applied only to mart-level fact tables. Staging, intermediate, and dimension models are kept simpler because they are either smaller, reused as transformation layers, or not queried at the same scale as analytical fact tables.
+
+
 
 ## Quick Start (Bring Your Own Credentials)
 
