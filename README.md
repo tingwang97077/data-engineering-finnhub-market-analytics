@@ -1,7 +1,7 @@
-# Finnhub Market Analytics
+# Financial market analytics for 50 U.S. large-cap stocks
 
-Open-source market analytics platform on a curated universe of 50 U.S. large-cap stocks across 11 GICS sectors.
-It ingests market data to GCS, transforms it in BigQuery with dbt, and serves visual analytics in Looker Studio.
+This is the final project for the Data Engineering Zoomcamp 2026 cohort. It is an open-source market analytics platform focused on a curated universe of 50 U.S. large-cap stocks across 11 GICS sectors. The platform ingests market data into GCS, transforms it in BigQuery using dbt, and delivers visual analytics through Looker Studio.
+
 
 ## Business Questions
 
