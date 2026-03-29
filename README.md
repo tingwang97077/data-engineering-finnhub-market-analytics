@@ -59,6 +59,10 @@ docker-compose.yml
 Makefile
 ```
 
+## Quick Start (Bring Your Own Credentials)
+
+**Each contributor must use their own cloud project, API key, and local config.**
+
 ## Prerequisites
 
 - Docker + Docker Compose plugin
@@ -66,10 +70,6 @@ Makefile
 - BigQuery location: `your_bq_location`
 - Local ADC auth: `your_gcloud_auth`
 - Finnhub API key
-
-## Quick Start (Bring Your Own Credentials)
-
-**Each contributor must use their own cloud project, API key, and local config.**
 
 ### 1) Copy templates
 
