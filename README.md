@@ -38,7 +38,7 @@ The project is designed to answer practical market questions, such as which sect
 
 ![img](/docs/images/architecture.png)
 
-This project is built as a batch-oriented market analytics platform on Google Cloud. Infrastructure is provisioned with Terraform, which creates the GCS bucket, BigQuery datasets, and required IAM resources.
+This project is built as a `batch-oriented` market analytics platform on Google Cloud. Infrastructure is provisioned with Terraform, which creates the GCS bucket, BigQuery datasets, and required IAM resources.
 
 Data is collected from the `Finnhub API`, with `yfinance` used as a fallback source for candle data when needed. The ingestion layer is implemented in Python and orchestrated by Airflow. Raw files are stored in GCS as Hive-partitioned Parquet files before being exposed in BigQuery through the raw layer.
 
