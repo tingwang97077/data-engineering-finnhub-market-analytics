@@ -302,6 +302,7 @@ GitHub repository settings required for CI/CD:
 
 ## Current Outputs
 
+link to dashboard : https://lookerstudio.google.com/s/iEJ3mGGKP2g
 - Sector cumulative return time series
   ![screenshot](docs/images/sector_cumulative_return.png)
 - Sector annualized volatility ranking
